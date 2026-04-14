@@ -41,7 +41,7 @@ jobs:
               npm install --ignore-scripts
 
               # Install prebuildify and node-gyp
-              npm install --save-dev prebuildify node-gyp
+              npm install --save-dev prebuildify node-gyp@9
 
               # Build for current Node (12.x) - no cross-version headers issue
               ./node_modules/.bin/prebuildify --target \$(node -v | tr -d 'v')
