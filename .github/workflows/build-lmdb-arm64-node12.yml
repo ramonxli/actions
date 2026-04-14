@@ -37,8 +37,8 @@ jobs:
               # Install runtime deps without triggering install script
               npm install --ignore-scripts
 
-              # Install prebuildify
-              npm install --save-dev prebuildify
+              # Install prebuildify and node-gyp
+              npm install --save-dev prebuildify node-gyp
 
               # Build for Node.js 12.17.0 (ABI 72)
               ./node_modules/.bin/prebuildify --target 12.17.0
