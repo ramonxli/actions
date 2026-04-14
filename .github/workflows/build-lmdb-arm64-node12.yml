@@ -44,7 +44,7 @@ jobs:
               npm install --save-dev prebuildify
 
               # Build for current Node (12.x) - no cross-version headers issue
-              ./node_modules/.bin/prebuildify
+              ./node_modules/.bin/prebuildify --target $(node -v | tr -d 'v')
 
               echo '--- Build output ---'
               ls -lh prebuilds/linux-arm64/
