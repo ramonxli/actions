@@ -28,7 +28,7 @@ jobs:
               sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/sources.list
               sed -i '/security.debian.org/d' /etc/apt/sources.list
               apt-get update -q
-              apt-get install -y -q g++ git
+              apt-get install -y -q g++ git python
 
               # Clone lmdb-store@1.6.14 (repo renamed from DoctorEvidence/lmdb-store to kriszyp/lmdb-js)
               git clone --recurse-submodules --shallow-submodules \
@@ -40,11 +40,11 @@ jobs:
               # Install runtime deps without triggering install script
               npm install --ignore-scripts
 
-              # Install prebuildify (node-gyp comes bundled with npm in Node 12)
-              npm install --save-dev prebuildify
+              # Install prebuildify and node-gyp
+              npm install --save-dev prebuildify node-gyp
 
               # Build for current Node (12.x) - no cross-version headers issue
-              ./node_modules/.bin/prebuildify --target $(node -v | tr -d 'v')
+              ./node_modules/.bin/prebuildify --target \$(node -v | tr -d 'v')
 
               echo '--- Build output ---'
               ls -lh prebuilds/linux-arm64/
