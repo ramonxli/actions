@@ -38,7 +38,7 @@ jobs:
               npm install --ignore-scripts
 
               # Install prebuildify and node-gyp
-              npm install --save-dev prebuildify node-gyp
+              npm install --save-dev prebuildify node-gyp@9
 
               # Build for Node.js 12.17.0 (ABI 72)
               ./node_modules/.bin/prebuildify --target 12.17.0
