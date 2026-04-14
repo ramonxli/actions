@@ -19,13 +19,16 @@ jobs:
 
           docker run --rm --platform=linux/arm64 \
             -v "$(pwd)/output:/output" \
-            node:18-bullseye \
+            node:12-buster \
             bash -c "
               set -ex
               echo 'Architecture:' \$(uname -m)
 
+              # Buster is EOL, point to archive
+              sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/sources.list
+              sed -i '/security.debian.org/d' /etc/apt/sources.list
               apt-get update -q
-              apt-get install -y -q python3 make g++ git
+              apt-get install -y -q g++ git
 
               # Clone lmdb-store@1.6.14 (repo renamed from DoctorEvidence/lmdb-store to kriszyp/lmdb-js)
               git clone --recurse-submodules --shallow-submodules \
@@ -37,11 +40,11 @@ jobs:
               # Install runtime deps without triggering install script
               npm install --ignore-scripts
 
-              # Install prebuildify and node-gyp
-              npm install --save-dev prebuildify node-gyp@9
+              # Install prebuildify (node-gyp comes bundled with npm in Node 12)
+              npm install --save-dev prebuildify
 
-              # Build for Node.js 12.17.0 (ABI 72)
-              ./node_modules/.bin/prebuildify --target 12.17.0
+              # Build for current Node (12.x) - no cross-version headers issue
+              ./node_modules/.bin/prebuildify
 
               echo '--- Build output ---'
               ls -lh prebuilds/linux-arm64/
