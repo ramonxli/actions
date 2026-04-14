@@ -1,0 +1,57 @@
+name: Build lmdb-store ARM64 Node.js 12
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up QEMU (ARM64 emulation)
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build in ARM64 container
+        run: |
+          mkdir -p output
+
+          docker run --rm --platform=linux/arm64 \
+            -v "$(pwd)/output:/output" \
+            node:18-bullseye \
+            bash -c "
+              set -ex
+              echo 'Architecture:' \$(uname -m)
+
+              apt-get update -q
+              apt-get install -y -q python3 make g++ git
+
+              # Clone lmdb-store@1.6.14 (repo renamed from DoctorEvidence/lmdb-store to kriszyp/lmdb-js)
+              git clone --recurse-submodules --shallow-submodules \
+                --depth 1 --branch v1.6.14 \
+                https://github.com/kriszyp/lmdb-js.git /tmp/lmdb-store
+
+              cd /tmp/lmdb-store
+
+              # Install runtime deps without triggering install script
+              npm install --ignore-scripts
+
+              # Install prebuildify
+              npm install --save-dev prebuildify
+
+              # Build for Node.js 12.17.0 (ABI 72)
+              ./node_modules/.bin/prebuildify --target 12.17.0
+
+              echo '--- Build output ---'
+              ls -lh prebuilds/linux-arm64/
+
+              cp prebuilds/linux-arm64/node.abi72.node /output/
+            "
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lmdb-store-linux-arm64-node12
+          path: output/node.abi72.node
+          retention-days: 30
